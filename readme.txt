@@ -10,3 +10,5 @@ You can access the wiki [http://wiki440.ms2ms.com](http://wiki440.ms2ms.com).
 2. When you want to use login, make PRIVATE = True in config.py. Remember you can use id "name" and password "1234".
 3. Always use virtualenv and pip.
     * pip install -r requirements.txt
+
+
