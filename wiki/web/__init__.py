@@ -24,9 +24,21 @@ def get_users():
     users = getattr(g, '_users', None)
     if users is None:
         users = g._users = UserManager(current_app.config['USER_DIR'])
+        g._user_manager = UserManager(current_app.config['USER_DIR'])
     return users
 
 current_users = LocalProxy(get_users)
+
+
+def get_user_manager():
+    user_manager = getattr(g, '_user_manager', None)
+    if user_manager is None:
+        g._users = UserManager(current_app.config['USER_DIR'])
+        user_manager = g._user_manager = UserManager(current_app.config['USER_DIR'])
+    return user_manager
+
+
+current_user_manager = LocalProxy(get_user_manager)
 
 
 def create_app(directory):
@@ -51,6 +63,7 @@ def create_app(directory):
 
 loginmanager = LoginManager()
 loginmanager.login_view = 'wiki.user_login'
+
 
 @loginmanager.user_loader
 def load_user(name):

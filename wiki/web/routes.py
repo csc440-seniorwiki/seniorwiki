@@ -18,8 +18,10 @@ from wiki.web.forms import EditorForm
 from wiki.web.forms import LoginForm
 from wiki.web.forms import SearchForm
 from wiki.web.forms import URLForm
+from wiki.web.forms import RegisterForm
 from wiki.web import current_wiki
 from wiki.web import current_users
+from wiki.web import current_user_manager
 from wiki.web.user import protect
 
 
@@ -141,6 +143,16 @@ def user_login():
     return render_template('login.html', form=form)
 
 
+@bp.route('/user/register/', methods=['GET', 'POST'])
+def user_register():
+    form = RegisterForm()
+    if form.validate_on_submit():
+        current_user_manager.add_user(form.name.data, form.password.data)
+        flash('Registration successful, please login.', 'success')
+        return redirect(request.args.get("next") or url_for('wiki.user_login'))
+    return render_template('register.html', form=form)
+
+
 @bp.route('/user/logout/')
 @login_required
 def user_logout():
@@ -152,11 +164,6 @@ def user_logout():
 
 @bp.route('/user/')
 def user_index():
-    pass
-
-
-@bp.route('/user/create/')
-def user_create():
     pass
 
 

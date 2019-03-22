@@ -3,12 +3,18 @@
     "active": true,
     "authentication_method": "cleartext",
     "password": "1234",
-    "authenticated": true
+    "authenticated": false
   },
   "sam": {
     "active": true,
     "authentication_method": "cleartext",
     "password": "1234",
-    "authenticated": true
+    "authenticated": false
+  },
+  "aname": {
+    "active": true,
+    "authentication_method": "cleartext",
+    "authenticated": true,
+    "password": "12341234"
   }
 }
