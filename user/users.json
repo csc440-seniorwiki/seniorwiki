@@ -4,14 +4,22 @@
     "authentication_method": "cleartext",
     "password": "password",
     "authenticated": false,
-    "roles": ["wiki_edit", "wiki_delete", "wiki_rename_page", "wiki_create_page"]
+    "roles": [
+      "wiki_edit",
+      "wiki_delete",
+      "wiki_rename_page",
+      "wiki_create_page",
+      "wiki_edit_protected"
+    ]
   },
   "name": {
     "active": true,
     "authentication_method": "cleartext",
     "password": "1234",
     "authenticated": true,
-    "roles": ["wiki_edit"]
+    "roles": [
+      "wiki_edit"
+    ]
   },
   "sam": {
     "active": true,
@@ -23,7 +31,7 @@
   "aname": {
     "active": true,
     "authentication_method": "cleartext",
-    "authenticated": true,
+    "authenticated": false,
     "password": "12341234",
     "roles": []
   }

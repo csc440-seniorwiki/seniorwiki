@@ -32,6 +32,7 @@ from wiki.web.roles import edit_permission
 from wiki.web.roles import delete_permission
 from wiki.web.roles import create_page_permission
 from wiki.web.roles import rename_page_permission
+from wiki.web.roles import edit_protected_permission
 
 bp = Blueprint('wiki', __name__)
 
@@ -74,16 +75,25 @@ def create():
 @protect
 @edit_permission.require(http_exception=401)
 def edit(url):
-    page = current_wiki.get(url)
-    form = EditorForm(obj=page)
-    if form.validate_on_submit():
-        if not page:
-            page = current_wiki.get_bare(url)
-        form.populate_obj(page)
-        page.save()
-        flash('"%s" was saved.' % page.title, 'success')
-        return redirect(url_for('wiki.display', url=url))
-    return render_template('editor.html', form=form, page=page)
+    def load_page(page, can_edit):
+        form = EditorForm(obj=page)
+        if form.validate_on_submit():
+            if not page:
+                page = current_wiki.get_bare(url)
+            form.populate_obj(page)
+            page.save()
+            flash('"%s" was saved.' % page.title, 'success')
+            return redirect(url_for('wiki.display', url=url))
+        return render_template('editor.html', form=form, page=page, can_edit_protected_permission=can_edit)
+
+    wiki_page = current_wiki.get(url)
+    if wiki_page.protected == 'True':
+        with edit_protected_permission.require(http_exception=401):
+            return load_page(wiki_page, True)
+    else:
+        if edit_protected_permission.can():
+            return load_page(wiki_page, True)
+        return load_page(wiki_page, False)
 
 
 @bp.route('/preview/', methods=['POST'])

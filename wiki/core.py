@@ -237,6 +237,17 @@ class Page(object):
     def tags(self, value):
         self['tags'] = value
 
+    @property
+    def protected(self):
+        try:
+            return self['protected']
+        except KeyError:
+            return ""
+
+    @protected.setter
+    def protected(self, value):
+        self['protected'] = value
+
 
 class Wiki(object):
     def __init__(self, root):

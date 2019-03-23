@@ -14,7 +14,6 @@ from wiki.core import clean_url
 from wiki.web import current_wiki
 from wiki.web import current_users
 
-
 class URLForm(FlaskForm):
     url = StringField('', [InputRequired()])
 
@@ -38,6 +37,7 @@ class EditorForm(FlaskForm):
     title = StringField('', [InputRequired()])
     body = TextAreaField('', [InputRequired()])
     tags = StringField('')
+    protected = BooleanField(default=False)
 
 
 class LoginForm(FlaskForm):

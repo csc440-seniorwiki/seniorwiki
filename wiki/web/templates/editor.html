@@ -16,6 +16,9 @@ Wiki Editor
 			{{ input(form.title, placeholder="Title", class="span7", autocomplete="off") }}
 			{{ input(form.body, placeholder="Markdown", class="span7", rows="20") }}
 			{{ input(form.tags, placeholder="Tags (comma separated)", class="span7", autocomplete="off") }}
+            {% if can_edit_protected_permission %}
+                {{ input(form.protected, placeholder=False, class="span7", autocomplete="off") }}
+            {% endif %}
 			<div class="form-actions">
         <div class="pull-left">
           <a class="btn" href="#preview" id="previewbtn">Preview</a>
