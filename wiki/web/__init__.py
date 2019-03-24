@@ -4,13 +4,16 @@ from flask import current_app
 from flask import Flask
 from flask import g
 from flask_login import LoginManager
+from flask_login import current_user
 from werkzeug.local import LocalProxy
-
+from flask_principal import  Principal
 from wiki.core import Wiki
 from wiki.web.user import UserManager
+from flask_principal import identity_loaded, RoleNeed, UserNeed
 
 class WikiError(Exception):
     pass
+
 
 def get_wiki():
     wiki = getattr(g, '_wiki', None)
@@ -18,15 +21,30 @@ def get_wiki():
         wiki = g._wiki = Wiki(current_app.config['CONTENT_DIR'])
     return wiki
 
+
 current_wiki = LocalProxy(get_wiki)
+
 
 def get_users():
     users = getattr(g, '_users', None)
     if users is None:
         users = g._users = UserManager(current_app.config['USER_DIR'])
+        g._user_manager = UserManager(current_app.config['USER_DIR'])
     return users
 
+
 current_users = LocalProxy(get_users)
+
+
+def get_user_manager():
+    user_manager = getattr(g, '_user_manager', None)
+    if user_manager is None:
+        g._users = UserManager(current_app.config['USER_DIR'])
+        user_manager = g._user_manager = UserManager(current_app.config['USER_DIR'])
+    return user_manager
+
+
+current_user_manager = LocalProxy(get_user_manager)
 
 
 def create_app(directory):
@@ -43,8 +61,26 @@ def create_app(directory):
 
     loginmanager.init_app(app)
 
+    principals = Principal(app)
+
     from wiki.web.routes import bp
     app.register_blueprint(bp)
+
+    @identity_loaded.connect_via(app)
+    def on_identity_loaded(sender, identity):
+        # Set the identity user object
+        identity.user = current_user
+
+        # Add the UserNeed to the identity
+        if hasattr(current_user, 'id'):
+            identity.provides.add(UserNeed(current_user.id))
+
+        # Assuming the User model has a list of roles, update the
+        # identity with the roles that the user provides
+        if hasattr(current_user, 'roles'):
+            for role in current_user.roles:
+                identity.provides.add(RoleNeed(role))
+
 
     return app
 
@@ -52,6 +88,10 @@ def create_app(directory):
 loginmanager = LoginManager()
 loginmanager.login_view = 'wiki.user_login'
 
+
 @loginmanager.user_loader
 def load_user(name):
     return current_users.get_user(name)
+
+
+

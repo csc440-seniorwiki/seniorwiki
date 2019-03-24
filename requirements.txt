@@ -15,3 +15,4 @@ xvfbwrapper
 flask_login
 flask_wtf
 Flask-Bootstrap
+flask-principal

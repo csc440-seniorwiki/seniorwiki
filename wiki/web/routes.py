@@ -8,20 +8,31 @@ from flask import redirect
 from flask import render_template
 from flask import request
 from flask import url_for
+from flask import current_app
+from flask import session
 from flask_login import current_user
 from flask_login import login_required
 from flask_login import login_user
 from flask_login import logout_user
+from flask_principal import Identity
+from flask_principal import AnonymousIdentity
+from flask_principal import identity_changed
 
 from wiki.core import Processor
 from wiki.web.forms import EditorForm
 from wiki.web.forms import LoginForm
 from wiki.web.forms import SearchForm
 from wiki.web.forms import URLForm
+from wiki.web.forms import RegisterForm
 from wiki.web import current_wiki
 from wiki.web import current_users
+from wiki.web import current_user_manager
 from wiki.web.user import protect
-
+from wiki.web.roles import edit_permission
+from wiki.web.roles import delete_permission
+from wiki.web.roles import create_page_permission
+from wiki.web.roles import rename_page_permission
+from wiki.web.roles import edit_protected_permission
 
 bp = Blueprint('wiki', __name__)
 
@@ -51,6 +62,7 @@ def display(url):
 
 @bp.route('/create/', methods=['GET', 'POST'])
 @protect
+@create_page_permission.require(http_exception=401)
 def create():
     form = URLForm()
     if form.validate_on_submit():
@@ -61,17 +73,27 @@ def create():
 
 @bp.route('/edit/<path:url>/', methods=['GET', 'POST'])
 @protect
+@edit_permission.require(http_exception=401)
 def edit(url):
-    page = current_wiki.get(url)
-    form = EditorForm(obj=page)
-    if form.validate_on_submit():
-        if not page:
-            page = current_wiki.get_bare(url)
-        form.populate_obj(page)
-        page.save()
-        flash('"%s" was saved.' % page.title, 'success')
-        return redirect(url_for('wiki.display', url=url))
-    return render_template('editor.html', form=form, page=page)
+    def load_page(page, can_edit):
+        form = EditorForm(obj=page)
+        if form.validate_on_submit():
+            if not page:
+                page = current_wiki.get_bare(url)
+            form.populate_obj(page)
+            page.save()
+            flash('"%s" was saved.' % page.title, 'success')
+            return redirect(url_for('wiki.display', url=url))
+        return render_template('editor.html', form=form, page=page, can_edit_protected_permission=can_edit)
+
+    wiki_page = current_wiki.get(url)
+    if wiki_page.protected == 'True':
+        with edit_protected_permission.require(http_exception=401):
+            return load_page(wiki_page, True)
+    else:
+        if edit_protected_permission.can():
+            return load_page(wiki_page, True)
+        return load_page(wiki_page, False)
 
 
 @bp.route('/preview/', methods=['POST'])
@@ -85,6 +107,7 @@ def preview():
 
 @bp.route('/move/<path:url>/', methods=['GET', 'POST'])
 @protect
+@rename_page_permission.require(http_exception=401)
 def move(url):
     page = current_wiki.get_or_404(url)
     form = URLForm(obj=page)
@@ -97,6 +120,7 @@ def move(url):
 
 @bp.route('/delete/<path:url>/')
 @protect
+@delete_permission.require(http_exception=401)
 def delete(url):
     page = current_wiki.get_or_404(url)
     current_wiki.delete(url)
@@ -135,10 +159,21 @@ def user_login():
     if form.validate_on_submit():
         user = current_users.get_user(form.name.data)
         login_user(user)
+        identity_changed.send(current_app._get_current_object(), identity=Identity(user.name))
         user.set('authenticated', True)
         flash('Login successful.', 'success')
         return redirect(request.args.get("next") or url_for('wiki.index'))
     return render_template('login.html', form=form)
+
+
+@bp.route('/user/register/', methods=['GET', 'POST'])
+def user_register():
+    form = RegisterForm()
+    if form.validate_on_submit():
+        current_user_manager.add_user(form.name.data, form.password.data)
+        flash('Registration successful, please login.', 'success')
+        return redirect(request.args.get("next") or url_for('wiki.user_login'))
+    return render_template('register.html', form=form)
 
 
 @bp.route('/user/logout/')
@@ -146,17 +181,17 @@ def user_login():
 def user_logout():
     current_user.set('authenticated', False)
     logout_user()
+    for key in ('identity.name', 'identity.auth_type'):
+        session.pop(key, None)
+
+    identity_changed.send(current_app._get_current_object(),
+                          identity=AnonymousIdentity())
     flash('Logout successful.', 'success')
     return redirect(url_for('wiki.index'))
 
 
 @bp.route('/user/')
 def user_index():
-    pass
-
-
-@bp.route('/user/create/')
-def user_create():
     pass
 
 
@@ -176,7 +211,11 @@ def user_delete(user_id):
 """
 
 
+@bp.errorhandler(401)
+def page_not_found(error):
+    return render_template('401.html'), 401
+
+
 @bp.errorhandler(404)
 def page_not_found(error):
     return render_template('404.html'), 404
-
