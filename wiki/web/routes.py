@@ -33,6 +33,7 @@ from wiki.web.roles import delete_permission
 from wiki.web.roles import create_page_permission
 from wiki.web.roles import rename_page_permission
 from wiki.web.roles import edit_protected_permission
+from wiki.web.roles import delete_user_permission
 
 bp = Blueprint('wiki', __name__)
 
@@ -195,14 +196,18 @@ def user_index():
     pass
 
 
-@bp.route('/user/<int:user_id>/')
+@bp.route('/user/<string:user_id>/')
 def user_admin(user_id):
     pass
 
 
-@bp.route('/user/delete/<int:user_id>/')
+@bp.route('/user/delete/<string:user_id>/')
+@protect
+@delete_user_permission.require(http_exception=401)
 def user_delete(user_id):
-    pass
+    current_user_manager.delete_user(user_id)
+    flash('User deleted.', 'success')
+    return redirect(request.args.get("next") or url_for('wiki.user_login'))
 
 
 """
