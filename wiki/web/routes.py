@@ -24,9 +24,11 @@ from wiki.web.forms import LoginForm
 from wiki.web.forms import SearchForm
 from wiki.web.forms import URLForm
 from wiki.web.forms import RegisterForm
+from wiki.web.forms import UserRoleForm
 from wiki.web import current_wiki
 from wiki.web import current_users
 from wiki.web import current_user_manager
+from wiki.web import load_user
 from wiki.web.user import protect
 from wiki.web.roles import edit_permission
 from wiki.web.roles import delete_permission
@@ -34,6 +36,8 @@ from wiki.web.roles import create_page_permission
 from wiki.web.roles import rename_page_permission
 from wiki.web.roles import edit_protected_permission
 from wiki.web.roles import delete_user_permission
+from wiki.web.roles import edit_user_permission
+from wiki.web.roles import wiki_roles
 
 bp = Blueprint('wiki', __name__)
 
@@ -196,9 +200,17 @@ def user_index():
     pass
 
 
-@bp.route('/user/<string:user_id>/')
+@bp.route('/user/<string:user_id>/', methods=['GET', 'POST'])
+@protect
+@edit_user_permission.require(http_exception=401)
 def user_admin(user_id):
-    pass
+    form = UserRoleForm()
+    form.roles.choices = wiki_roles
+    if form.validate_on_submit():
+        user = load_user(user_id)
+        user.set('roles', form.roles.data)
+        return redirect(request.args.get("next") or url_for('wiki.user_login'))
+    return render_template('useradmin.html', form=form)
 
 
 @bp.route('/user/delete/<string:user_id>/')

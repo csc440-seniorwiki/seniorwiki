@@ -7,12 +7,15 @@ from wtforms import BooleanField
 from wtforms import StringField
 from wtforms import TextAreaField
 from wtforms import PasswordField
+from wtforms import SelectMultipleField
 from wtforms.validators import InputRequired
 from wtforms.validators import ValidationError
 
 from wiki.core import clean_url
 from wiki.web import current_wiki
 from wiki.web import current_users
+
+
 
 class URLForm(FlaskForm):
     url = StringField('', [InputRequired()])
@@ -65,3 +68,7 @@ class RegisterForm(FlaskForm):
         user = current_users.get_user(field.data)
         if user:
             raise ValidationError('This username already exists.')
+
+
+class UserRoleForm(FlaskForm):
+    roles = SelectMultipleField('roles')

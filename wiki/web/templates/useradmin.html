@@ -1,0 +1,11 @@
+{% extends "base.html" %}
+
+{% block title %}Register{% endblock title %}
+
+{% block content %}
+<form class="form form-inline" method="POST">
+	{{ form.hidden_tag() }}
+	{{ form.roles() }}
+	<input type="submit" class="btn btn-primary" value="User Roles">
+</form>
+{% endblock content %}
