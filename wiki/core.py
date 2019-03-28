@@ -2,6 +2,7 @@
     Wiki core
     ~~~~~~~~~
 """
+from wiki import git_integration
 from collections import OrderedDict
 from io import open
 import os
@@ -10,6 +11,8 @@ import re
 from flask import abort
 from flask import url_for
 import markdown
+
+from git import Repo
 
 
 def clean_url(url):
@@ -188,12 +191,14 @@ class Page(object):
         folder = os.path.dirname(self.path)
         if not os.path.exists(folder):
             os.makedirs(folder)
+            Repo.init(git_integration.get_repo_path(self.path))
         with open(self.path, 'w', encoding='utf-8') as f:
             for key, value in list(self._meta.items()):
                 line = '%s: %s\n' % (key, value)
                 f.write(line)
             f.write('\n')
             f.write(self.body.replace('\r\n', '\n'))
+        Repo(git_integration.get_repo_path(self.path)).index.commit("modified")
         if update:
             self.load()
             self.render()

@@ -67,7 +67,7 @@ def create():
     form = URLForm()
     if form.validate_on_submit():
         return redirect(url_for(
-            'wiki.edit', url=form.clean_url(form.url.data)))
+            'wiki.edit', url=form.clean_url(form.url.data + '/' + form.url.data)))
     return render_template('create.html', form=form)
 
 
@@ -87,7 +87,7 @@ def edit(url):
         return render_template('editor.html', form=form, page=page, can_edit_protected_permission=can_edit)
 
     wiki_page = current_wiki.get(url)
-    if wiki_page.protected == 'True':
+    if wiki_page and wiki_page.protected == 'True':
         with edit_protected_permission.require(http_exception=401):
             return load_page(wiki_page, True)
     else:
