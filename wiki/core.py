@@ -309,6 +309,9 @@ class Wiki(object):
         if not os.path.exists(folder):
             os.makedirs(folder)
         os.rename(source, target)
+        repo = Repo(git_integration.get_repo_path(target))
+        repo.index.add([target.replace("/", "\\")])
+        Repo(git_integration.get_repo_path(target)).index.commit("Moved to " + newurl)
 
     def delete(self, url):
         path = self.path(url)

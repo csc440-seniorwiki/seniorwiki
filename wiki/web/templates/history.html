@@ -19,7 +19,7 @@
   </div>
     <ul>
 	    {% for diff in difference %}
-            <li>{{ diff }}</li>
+            <li><a href="{{ url_for('wiki.revert', url=page.url, location=loop.index) }}">{{ diff }}</a></li>
         {% endfor %}
     </ul>
 {% endblock content %}

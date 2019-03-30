@@ -71,6 +71,15 @@ def display_history(url):
     return render_template('history.html', page=page, difference=diff)
 
 
+@bp.route('/revert/<path:url>/<location>')
+@protect
+def revert(url=None, location=None):
+    page = current_wiki.get_or_404(url)
+    repo = Repo.init(git_integration.get_repo_path(page.path))
+    git_integration.revert(repo, location)
+    return index()
+
+
 @bp.route('/create/', methods=['GET', 'POST'])
 @protect
 @create_page_permission.require(http_exception=401)
@@ -96,6 +105,7 @@ def edit(url):
             flash('"%s" was saved.' % page.title, 'success')
             return redirect(url_for('wiki.display', url=url))
         return render_template('editor.html', form=form, page=page, can_edit_protected_permission=can_edit)
+
     wiki_page = current_wiki.get(url)
     if wiki_page and wiki_page.protected == 'True':
         with edit_protected_permission.require(http_exception=401):
