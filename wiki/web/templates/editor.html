@@ -16,6 +16,7 @@ Wiki Editor
 			{{ input(form.title, placeholder="Title", class="span7", autocomplete="off") }}
 			{{ input(form.body, placeholder="Markdown", class="span7", rows="20") }}
 			{{ input(form.tags, placeholder="Tags (comma separated)", class="span7", autocomplete="off") }}
+            {{ input(form.modification, placeholder="Please put a summary of your changes", class="spand7", autocomplet="off") }}
             {% if can_edit_protected_permission %}
                 {{ input(form.protected, placeholder=False, class="span7", autocomplete="off") }}
             {% endif %}

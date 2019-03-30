@@ -187,18 +187,23 @@ class Page(object):
         processor = Processor(self.content)
         self._html, self.body, self._meta = processor.process()
 
-    def save(self, update=True):
+    def save(self, modification_message, update=True):
         folder = os.path.dirname(self.path)
+        repo = ""
         if not os.path.exists(folder):
             os.makedirs(folder)
-            Repo.init(git_integration.get_repo_path(self.path))
+            repo = Repo.init(git_integration.get_repo_path(self.path))
+        else:
+            repo = Repo(git_integration.get_repo_path(self.path))
+            repo.git.add(update=True)
         with open(self.path, 'w', encoding='utf-8') as f:
             for key, value in list(self._meta.items()):
                 line = '%s: %s\n' % (key, value)
                 f.write(line)
             f.write('\n')
             f.write(self.body.replace('\r\n', '\n'))
-        Repo(git_integration.get_repo_path(self.path)).index.commit("modified")
+        repo.index.add([self.path.replace("/", "\\")])
+        repo.index.commit(modification_message)
         if update:
             self.load()
             self.render()

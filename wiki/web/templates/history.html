@@ -17,7 +17,11 @@
       <a href="{{ url_for('wiki.delete', url=page.url) }}" class="btn btn-danger">Yes, delete.</a>
     </div>
   </div>
-	{{ page }}
+    <ul>
+	    {% for diff in difference %}
+            <li>{{ diff }}</li>
+        {% endfor %}
+    </ul>
 {% endblock content %}
 
 {% block sidebar %}
@@ -34,6 +38,5 @@
 	<li><a href="{{ url_for('wiki.edit', url=page.url) }}">Edit</a></li>
   <li><a href="{{ url_for('wiki.move', url=page.url) }}">Move</a></li>
   <li><a href="#confirmDelete" data-toggle="modal" class="text-error">Delete</a></li>
-    <li><a href="{{ url_for('wiki.display_history', url=page.url) }}"> History</a></li>
 </ul>
 {% endblock sidebar %}

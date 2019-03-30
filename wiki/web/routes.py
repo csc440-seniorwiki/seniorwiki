@@ -34,6 +34,9 @@ from wiki.web.roles import create_page_permission
 from wiki.web.roles import rename_page_permission
 from wiki.web.roles import edit_protected_permission
 
+from wiki import git_integration
+from git import Repo
+
 bp = Blueprint('wiki', __name__)
 
 
@@ -60,6 +63,14 @@ def display(url):
     return render_template('page.html', page=page)
 
 
+@bp.route('/history/<path:url>/')
+@protect
+def display_history(url):
+    page = current_wiki.get_or_404(url)
+    diff = git_integration.get_difference_in_file(Repo.init(git_integration.get_repo_path(page.path)))
+    return render_template('history.html', page=page, difference=diff)
+
+
 @bp.route('/create/', methods=['GET', 'POST'])
 @protect
 @create_page_permission.require(http_exception=401)
@@ -81,11 +92,10 @@ def edit(url):
             if not page:
                 page = current_wiki.get_bare(url)
             form.populate_obj(page)
-            page.save()
+            page.save(modification_message=str(form.modification.data))
             flash('"%s" was saved.' % page.title, 'success')
             return redirect(url_for('wiki.display', url=url))
         return render_template('editor.html', form=form, page=page, can_edit_protected_permission=can_edit)
-
     wiki_page = current_wiki.get(url)
     if wiki_page and wiki_page.protected == 'True':
         with edit_protected_permission.require(http_exception=401):

@@ -37,6 +37,7 @@ class EditorForm(FlaskForm):
     title = StringField('', [InputRequired()])
     body = TextAreaField('', [InputRequired()])
     tags = StringField('')
+    modification = StringField('', [InputRequired()])
     protected = BooleanField(default=False)
 
 
