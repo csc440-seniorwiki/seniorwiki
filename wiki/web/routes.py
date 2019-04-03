@@ -25,10 +25,13 @@ from wiki.web.forms import SearchForm
 from wiki.web.forms import URLForm
 from wiki.web.forms import RegisterForm
 from wiki.web.forms import UserRoleForm
+from wiki.web.forms import GroupRoleForm
 from wiki.web import current_wiki
 from wiki.web import current_users
 from wiki.web import current_user_manager
+from wiki.web import current_group_manager
 from wiki.web import load_user
+from wiki.web import load_group
 from wiki.web.user import protect
 from wiki.web.roles import edit_permission
 from wiki.web.roles import delete_permission
@@ -37,6 +40,7 @@ from wiki.web.roles import rename_page_permission
 from wiki.web.roles import edit_protected_permission
 from wiki.web.roles import delete_user_permission
 from wiki.web.roles import edit_user_permission
+from wiki.web.roles import edit_group_permission
 from wiki.web.roles import wiki_roles
 
 bp = Blueprint('wiki', __name__)
@@ -206,11 +210,26 @@ def user_index():
 def user_admin(user_id):
     form = UserRoleForm()
     form.roles.choices = wiki_roles
+    form.groups.choices = map(lambda x: tuple([x.get_id(), x.get_id()]), current_group_manager.get_groups())
     if form.validate_on_submit():
         user = load_user(user_id)
         user.set('roles', form.roles.data)
+        user.set('groups', form.groups.data)
         return redirect(request.args.get("next") or url_for('wiki.user_login'))
     return render_template('useradmin.html', form=form)
+
+
+@bp.route('/group/<string:group_id>/', methods=['GET', 'POST'])
+@protect
+@edit_group_permission.require(http_exception=401)
+def group_admin(group_id):
+    form = GroupRoleForm()
+    form.roles.choices = wiki_roles
+    if form.validate_on_submit():
+        user = load_group(group_id)
+        user.set('roles', form.roles.data)
+        return redirect(request.args.get("next") or url_for('wiki.user_login'))
+    return render_template('groupadmin.html', form=form)
 
 
 @bp.route('/user/delete/<string:user_id>/')

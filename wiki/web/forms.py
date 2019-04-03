@@ -72,3 +72,8 @@ class RegisterForm(FlaskForm):
 
 class UserRoleForm(FlaskForm):
     roles = SelectMultipleField('roles')
+    groups = SelectMultipleField('groups')
+
+
+class GroupRoleForm(FlaskForm):
+    roles = SelectMultipleField('roles')

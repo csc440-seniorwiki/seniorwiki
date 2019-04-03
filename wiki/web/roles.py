@@ -9,6 +9,7 @@ wiki_create_page = 'wiki_create_page'
 wiki_edit_protected = 'wiki_edit_protected'
 wiki_delete_user = 'wiki_delete_user'
 wiki_edit_user = 'wiki_edit_user'
+wiki_edit_group = 'wiki_edit_group'
 
 edit_permission = Permission(RoleNeed(wiki_edit))
 delete_permission = Permission(RoleNeed(wiki_delete))
@@ -17,6 +18,7 @@ create_page_permission = Permission(RoleNeed(wiki_create_page))
 edit_protected_permission = Permission(RoleNeed(wiki_edit_protected))
 delete_user_permission = Permission(RoleNeed(wiki_delete_user))
 edit_user_permission = Permission(RoleNeed(wiki_edit_user))
+edit_group_permission = Permission(RoleNeed(wiki_edit_group))
 
 wiki_roles = []
 wiki_roles.append(tuple([wiki_edit, "Edit Page"]))
@@ -26,3 +28,4 @@ wiki_roles.append(tuple([wiki_create_page, "Create Page"]))
 wiki_roles.append(tuple([wiki_edit_protected, "Edit Protected Page"]))
 wiki_roles.append(tuple([wiki_delete_user, "Delete User"]))
 wiki_roles.append(tuple([wiki_edit_user, "Edit User Permissions"]))
+wiki_roles.append(tuple([wiki_edit_group, "Edit Group Permissions"]))
