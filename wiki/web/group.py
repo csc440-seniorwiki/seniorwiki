@@ -76,7 +76,6 @@ class Group(object):
         self.manager = manager
         self.name = name
         self.data = data
-        self.roles = data.get('roles')
 
     def get(self, option):
         return self.data.get(option)
