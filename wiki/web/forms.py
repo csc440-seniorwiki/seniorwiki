@@ -77,3 +77,8 @@ class UserRoleForm(FlaskForm):
 
 class GroupRoleForm(FlaskForm):
     roles = SelectMultipleField('roles')
+
+
+class CreateGroupForm(FlaskForm):
+    name = StringField('', [InputRequired()])
+    roles = SelectMultipleField('roles')
