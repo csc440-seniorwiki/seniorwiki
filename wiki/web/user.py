@@ -84,7 +84,6 @@ class User(object):
         self.is_anonymous = False
         self.is_authenticated = data.get('authenticated')
         self.is_active = data.get('active')
-        self.roles = data.get('roles')
 
     def get(self, option):
         return self.data.get(option)

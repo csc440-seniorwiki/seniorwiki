@@ -89,8 +89,8 @@ def create_app(directory):
 
         # Assuming the User model has a list of roles, update the
         # identity with the roles that the user provides
-        if hasattr(current_user, 'roles'):
-            for role in current_user.roles:
+        if current_user.get('roles'):
+            for role in current_user.get('roles'):
                 identity.provides.add(RoleNeed(role))
         if current_user.get('groups'):
             for user_group in current_user.get('groups'):
