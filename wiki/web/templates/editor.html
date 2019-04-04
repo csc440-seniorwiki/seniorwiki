@@ -22,6 +22,8 @@ Wiki Editor
 			<div class="form-actions">
         <div class="pull-left">
           <a class="btn" href="#preview" id="previewbtn">Preview</a>
+            <a class="btn" href="{{ url_for('wiki.uploader') }}">Upload</a>
+            <a class="btn" href="{{ url_for('wiki.images') }}">Images</a>
         </div>
 				<div class="pull-right">
           <a class="btn" href="{{ url_for('wiki.display', url=page.url) }}">Cancel</a>

@@ -3,7 +3,7 @@
     "active": true,
     "authentication_method": "cleartext",
     "password": "password",
-    "authenticated": false,
+    "authenticated": true,
     "roles": [
       "wiki_edit",
       "wiki_delete",
