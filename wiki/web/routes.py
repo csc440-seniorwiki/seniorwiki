@@ -29,7 +29,6 @@ from wiki.web.forms import GroupRoleForm
 from wiki.web.forms import CreateGroupForm
 from wiki.web import current_wiki
 from wiki.web import current_users
-from wiki.web import current_user_manager
 from wiki.web import current_group_manager
 from wiki.web import load_user
 from wiki.web import load_group
@@ -182,7 +181,7 @@ def user_login():
 def user_register():
     form = RegisterForm()
     if form.validate_on_submit():
-        current_user_manager.add_user(form.name.data, form.password.data)
+        current_users.add_user(form.name.data, form.password.data)
         flash('Registration successful, please login.', 'success')
         return redirect(request.args.get("next") or url_for('wiki.user_login'))
     return render_template('register.html', form=form)
@@ -226,7 +225,7 @@ def user_admin(user_id):
 @protect
 @delete_user_permission.require(http_exception=401)
 def user_delete(user_id):
-    current_user_manager.delete_user(user_id)
+    current_users.delete_user(user_id)
     flash('User deleted.', 'success')
     return redirect(request.args.get("next") or url_for('wiki.user_login'))
 
