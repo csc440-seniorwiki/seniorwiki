@@ -87,15 +87,15 @@ def create_app(directory):
         if hasattr(current_user, 'id'):
             identity.provides.add(UserNeed(current_user.id))
 
-        # Assuming the User model has a list of roles, update the
-        # identity with the roles that the user provides
-        if current_user.get('roles'):
-            for role in current_user.get('roles'):
-                identity.provides.add(RoleNeed(role))
-        if current_user.get('groups'):
-            for user_group in current_user.get('groups'):
-                for role in load_group(user_group).get('roles'):
+        # Assign user privileges based on their roles and group membership
+        if not current_user.is_anonymous:
+            if current_user.get('roles'):
+                for role in current_user.get('roles'):
                     identity.provides.add(RoleNeed(role))
+            if current_user.get('groups'):
+                for user_group in current_user.get('groups'):
+                    for role in load_group(user_group).get('roles'):
+                        identity.provides.add(RoleNeed(role))
 
     return app
 
