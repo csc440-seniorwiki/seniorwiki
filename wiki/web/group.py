@@ -70,6 +70,13 @@ class GroupManager(object):
         data[name] = groupdata
         self.write(data)
 
+    def index(self):
+        groups = self.read()
+        group_objects = []
+        for group in groups.items():
+            group_objects.append({"name": group[0], "url": "/group/" + group[0]})
+        return group_objects
+
 
 class Group(object):
     def __init__(self, manager, name, data):

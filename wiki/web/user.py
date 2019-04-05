@@ -74,6 +74,14 @@ class UserManager(object):
         data[name] = userdata
         self.write(data)
 
+    def index(self):
+        users = self.read()
+        user_objects = []
+        for user in users.items():
+            user_objects.append({"name": user[0], "url": "/user/" + user[0]})
+        print(user_objects)
+        return user_objects
+
 
 class User(object):
     def __init__(self, manager, name, data):

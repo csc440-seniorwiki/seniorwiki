@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+
+{% block title %}User Index{% endblock title %}
+
+{% block content %}
+{% if users %}
+	<table class="table">
+		<thead>
+			<tr>
+				<th>User</th>
+				<th>URL</th>
+			</tr>
+		</thead>
+		<tbody>
+			{% for user in users %}
+				<tr>
+					<td><a href="{{ url_for('wiki.display', url=user.url) }}">{{ user.name }}</a></td>
+					<td><a href="{{ url_for('wiki.display', url=user.url) }}">{{ user.url }}</a></td>
+				</tr>
+			{% endfor %}
+		</tbody>
+	</table>
+{% else %}
+	<p>There are no users yet.</p>
+{% endif %}
+{% endblock content %}
+
+{% block sidebar %}
+<ul class="nav nav-tabs nav-stacked">
+	<li><a href="{{ url_for('wiki.tags') }}">Tag List</a></li>
+	<li><a href="{{ url_for('wiki.search') }}">Search</a></li>
+</ul>
+{% endblock sidebar %}

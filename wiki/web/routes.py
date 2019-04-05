@@ -203,8 +203,13 @@ def user_logout():
 
 @bp.route('/user/')
 def user_index():
-    pass
+    users = current_users.index()
+    return render_template('userindex.html', users=users)
 
+@bp.route('/group/')
+def group_index():
+    groups = current_group_manager.index()
+    return render_template('groupindex.html', groups=groups)
 
 @bp.route('/user/<string:user_id>/', methods=['GET', 'POST'])
 @protect
@@ -230,7 +235,7 @@ def user_delete(user_id):
     return redirect(request.args.get("next") or url_for('wiki.user_login'))
 
 
-@bp.route('/group/create/<string:group_id>/', methods=['GET', 'POST'])
+@bp.route('/group/create/', methods=['GET', 'POST'])
 @create_group_permission.require(http_exception=401)
 def group_create():
     form = CreateGroupForm()
