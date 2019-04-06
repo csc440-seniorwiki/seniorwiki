@@ -12,6 +12,7 @@ from wiki.web.user import UserManager
 from wiki.web.group import GroupManager
 from flask_principal import identity_loaded, RoleNeed, UserNeed
 
+
 class WikiError(Exception):
     pass
 
