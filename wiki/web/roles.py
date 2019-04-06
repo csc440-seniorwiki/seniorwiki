@@ -35,3 +35,17 @@ wiki_roles.append(tuple([wiki_edit_user, "Edit User Permissions"]))
 wiki_roles.append(tuple([wiki_edit_group, "Edit Group Permissions"]))
 wiki_roles.append(tuple([wiki_delete_group, "Delete Group Permissions"]))
 wiki_roles.append(tuple([wiki_create_group, "Delete Group Permissions"]))
+
+wiki_permissions = [edit_permission,
+                    delete_permission,
+                    rename_page_permission,
+                    create_page_permission,
+                    rename_page_permission,
+                    create_page_permission,
+                    edit_protected_permission,
+                    delete_user_permission,
+                    edit_user_permission,
+                    edit_group_permission,
+                    delete_group_permission,
+                    create_group_permission
+                    ]

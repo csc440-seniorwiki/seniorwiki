@@ -6,7 +6,7 @@ from flask import g
 from flask_login import LoginManager
 from flask_login import current_user
 from werkzeug.local import LocalProxy
-from flask_principal import  Principal
+from flask_principal import Principal
 from wiki.core import Wiki
 from wiki.web.user import UserManager
 from wiki.web.group import GroupManager
