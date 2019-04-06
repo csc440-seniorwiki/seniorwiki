@@ -223,7 +223,7 @@ def user_admin(user_id):
         user.set('roles', form.roles.data)
         user.set('groups', form.groups.data)
         return redirect(request.args.get("next") or url_for('wiki.user_login'))
-    return render_template('useradmin.html', form=form)
+    return render_template('useradmin.html', form=form, page= {"url": user_id})
 
 
 @bp.route('/user/delete/<string:user_id>/')
@@ -239,6 +239,7 @@ def user_delete(user_id):
 @create_group_permission.require(http_exception=401)
 def group_create():
     form = CreateGroupForm()
+    form.roles.choices = wiki_roles
     if form.validate_on_submit():
         current_group_manager.add_group(form.name.data, form.roles.data)
         flash('Group creation successful.', 'success')
