@@ -43,10 +43,8 @@ class GroupManager(object):
     def get_groups(self):
         groups = self.read()
         group_objects = []
-        print(groups)
         for key, value in groups.items():
             group_objects.append(Group(self, key, value))
-            print(group_objects)
         if not group_objects:
             return None
         return group_objects

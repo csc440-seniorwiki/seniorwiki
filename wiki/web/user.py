@@ -79,7 +79,6 @@ class UserManager(object):
         user_objects = []
         for user in users.items():
             user_objects.append({"name": user[0], "url": "/user/" + user[0]})
-        print(user_objects)
         return user_objects
 
 
