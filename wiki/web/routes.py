@@ -223,7 +223,7 @@ def user_admin(user_id):
         user.set('roles', form.roles.data)
         user.set('groups', form.groups.data)
         return redirect(request.args.get("next") or url_for('wiki.user_login'))
-    return render_template('useradmin.html', form=form, page= {"url": user_id})
+    return render_template('useradmin.html', form=form, page={"url": user_id})
 
 
 @bp.route('/user/delete/<string:user_id>/')
@@ -257,7 +257,7 @@ def group_admin(group_id):
         group = load_group(group_id)
         group.set('roles', form.roles.data)
         return redirect(request.args.get("next") or url_for('wiki.user_login'))
-    return render_template('groupadmin.html', form=form)
+    return render_template('groupadmin.html', form=form, group={"name": group_id})
 
 
 @bp.route('/group/delete/<string:group_id>/', methods=['GET', 'POST'])

@@ -14,7 +14,7 @@
 		<tbody>
 			{% for group in groups %}
 				<tr>
-					<td><a href="{{ url_for('wiki.display', url=group.url) }}">{{ group.title }}</a></td>
+					<td><a href="{{ url_for('wiki.display', url=group.url) }}">{{ group.name }}</a></td>
 					<td><a href="{{ url_for('wiki.display', url=group.url) }}">{{ group.url }}</a></td>
 				</tr>
 			{% endfor %}
@@ -28,7 +28,5 @@
 {% block sidebar %}
 <ul class="nav nav-tabs nav-stacked">
 	<li><a href="{{ url_for('wiki.group_create') }}">New Group</a></li>
-	<li><a href="{{ url_for('wiki.tags') }}">Tag List</a></li>
-	<li><a href="{{ url_for('wiki.search') }}">Search</a></li>
 </ul>
 {% endblock sidebar %}
