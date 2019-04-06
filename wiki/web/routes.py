@@ -33,6 +33,9 @@ from wiki.web.roles import delete_permission
 from wiki.web.roles import create_page_permission
 from wiki.web.roles import rename_page_permission
 from wiki.web.roles import edit_protected_permission
+from wiki.web.md2pdf import md2pdf_single_page
+from wiki.web.md2pdf import md2pdf_multiple_page
+from wiki.web.md2pdf import md2pdf_full_wiki
 
 bp = Blueprint('wiki', __name__)
 
@@ -203,6 +206,24 @@ def user_admin(user_id):
 @bp.route('/user/delete/<int:user_id>/')
 def user_delete(user_id):
     pass
+
+
+@bp.route('/pdf/<path:url>/')
+@protect
+def single_page_pdf(url):
+    return md2pdf_single_page(url, 'pdf_page.html')
+
+
+@bp.route('/selectpdf/', methods=['GET', 'POST'])
+@protect
+def multiple_page_pdf():
+    return md2pdf_multiple_page('pdf_page.html', 'pdf_select_pages.html')
+
+
+@bp.route('/fullpdf/')
+@protect
+def full_wiki_pdf():
+    return md2pdf_full_wiki('pdf_page.html')
 
 
 """
