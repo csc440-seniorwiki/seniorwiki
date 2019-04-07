@@ -31,9 +31,40 @@ class ConversionTests(unittest.TestCase):
         self.client = app.test_client()
 
     def test_single_page_pdf(self):
+        #with self.client:
+        #    login_to_website(admin, self.client)
+        #    #response = self.client.get('/pdf/pdftest1/')
+        #    response = self.client.get('/single_page_test.pdf')
+        #    assert response.mimetype == "application/pdf"
+        #    pdf = response.data
+        #    assert pdf.startswith(b'%PDF')
+        #    assert b'AsciiDots' in pdf
+        with self.app.test_request_context():
+            received = md2pdf_single_page('pdftest1', 'pdf_page.html')
+        assert received.mimetype == "application/pdf"
+        #assert 'Content-Disposition' not in response.headers
+        assert b'PDFTest1' in received.data
+        #assert b'CreationDate' in pdf
+        assert b'localhost' in received.data
+        #pdf = re.sub(rb'.*CreationDate.*\n?', b'', pdf, flags=re.MULTILINE)
+        received.data = re.sub(rb'localhost', b'127.0.0.1:5000', received.data, flags=re.MULTILINE)
+        received.data = re.sub(rb'.*CreationDate.*\n?', b'', received.data, flags=re.MULTILINE)
+        #assert b'CreationDate' not in pdf
+        #assert b'AsciiDots' in pdf
+        #f = open("output.pdf", "wb")
+        #f.write(pdf)
+        #f.close()
+        f = open("single_page_test.pdf", "rb")
+        #f.write(received.data)
+        pdf = f.read()
+        f.close()
+        self.assertEqual(hashlib.md5(pdf).hexdigest(), hashlib.md5(received.data).hexdigest())
+
+    def test_multiple_page_pdf(self):
         with self.client:
             login_to_website(admin, self.client)
-            response = self.client.get('/pdf/pdftest1/')#, follow_redirects=True)
+            #response = self.client.get('/pdf/pdftest1/')
+            response = self.client.get('/selectpdf/?page=AsciiDots?page=')
             assert response.mimetype == "application/pdf"
             pdf = response.data
             assert pdf.startswith(b'%PDF')
@@ -41,13 +72,21 @@ class ConversionTests(unittest.TestCase):
         with self.app.test_request_context():
             received = md2pdf_single_page('pdftest1', 'pdf_page.html')
         assert received.mimetype == "application/pdf"
-        assert 'Content-Disposition' not in response.headers
+        #assert 'Content-Disposition' not in response.headers
         assert b'AsciiDots' in received.data
-        assert b'CreationDate' in pdf
-        pdf = re.sub(rb'.*CreationDate.*\n?', b'', pdf, flags=re.MULTILINE)
+        #assert b'CreationDate' in pdf
+        assert b'localhost' in received.data
+        #pdf = re.sub(rb'.*CreationDate.*\n?', b'', pdf, flags=re.MULTILINE)
+        received.data = re.sub(rb'localhost', b'127.0.0.1:5000', received.data, flags=re.MULTILINE)
         received.data = re.sub(rb'.*CreationDate.*\n?', b'', received.data, flags=re.MULTILINE)
-        assert b'CreationDate' not in pdf
-        assert b'AsciiDots' in pdf
+        #assert b'CreationDate' not in pdf
+        #assert b'AsciiDots' in pdf
+        #f = open("output.pdf", "wb")
+        #f.write(pdf)
+        #f.close()
+        f = open("multiple_page_test.pdf", "rb")
+        pdf = f.read()
+        f.close()
         self.assertEqual(hashlib.md5(pdf).hexdigest(), hashlib.md5(received.data).hexdigest())
 
 
