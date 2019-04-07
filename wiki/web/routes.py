@@ -119,7 +119,6 @@ def addpoll(url):
 def edit(url):
     page = current_wiki.get(url)
     form = EditorForm(obj=page)
-
     if form.validate_on_submit():
         if not page:
             page = current_wiki.get_bare(url)
