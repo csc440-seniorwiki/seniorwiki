@@ -2,12 +2,8 @@ import unittest
 import os
 import re
 import hashlib
-from weasyprint import HTML
 from pathlib import Path
 from wiki.web import create_app
-from wiki.web.md2pdf import md2pdf_single_page
-from wiki.web.md2pdf import md2pdf_multiple_page
-from wiki.web.md2pdf import md2pdf_full_wiki
 
 
 admin = {'username': 'admin', 'password': "password"}
@@ -31,63 +27,46 @@ class ConversionTests(unittest.TestCase):
         self.client = app.test_client()
 
     def test_single_page_pdf(self):
-        #with self.client:
-        #    login_to_website(admin, self.client)
-        #    #response = self.client.get('/pdf/pdftest1/')
-        #    response = self.client.get('/single_page_test.pdf')
-        #    assert response.mimetype == "application/pdf"
-        #    pdf = response.data
-        #    assert pdf.startswith(b'%PDF')
-        #    assert b'AsciiDots' in pdf
-        with self.app.test_request_context():
-            received = md2pdf_single_page('pdftest1', 'pdf_page.html')
-        assert received.mimetype == "application/pdf"
-        #assert 'Content-Disposition' not in response.headers
-        assert b'PDFTest1' in received.data
-        #assert b'CreationDate' in pdf
-        assert b'localhost' in received.data
-        #pdf = re.sub(rb'.*CreationDate.*\n?', b'', pdf, flags=re.MULTILINE)
-        received.data = re.sub(rb'localhost', b'127.0.0.1:5000', received.data, flags=re.MULTILINE)
-        received.data = re.sub(rb'.*CreationDate.*\n?', b'', received.data, flags=re.MULTILINE)
-        #assert b'CreationDate' not in pdf
-        #assert b'AsciiDots' in pdf
-        #f = open("output.pdf", "wb")
-        #f.write(pdf)
-        #f.close()
+        with self.client:
+            login_to_website(admin, self.client)
+            actual_response = self.client.get('/pdf/pdftest1/')
+        assert actual_response.mimetype == "application/pdf"
+        actual = actual_response.data
+        assert actual.startswith(b'%PDF')
+        assert b'PDFTest1' in actual
+        assert b'CreationDate' in actual
+        assert b'localhost' in actual
+        actual = re.sub(rb'localhost', b'127.0.0.1:5000', actual, flags=re.MULTILINE)
+        actual = re.sub(rb'.*CreationDate.*\n?', b'', actual, flags=re.MULTILINE)
+        assert b'PDFTest1' in actual
+        assert b'CreationDate' not in actual
+        assert b'localhost' not in actual
         f = open("single_page_test.pdf", "rb")
-        #f.write(received.data)
-        pdf = f.read()
+        expected = f.read()
         f.close()
-        self.assertEqual(hashlib.md5(pdf).hexdigest(), hashlib.md5(received.data).hexdigest())
+        self.assertEqual(hashlib.md5(expected).hexdigest(), hashlib.md5(actual).hexdigest())
 
     def test_multiple_page_pdf(self):
         with self.client:
             login_to_website(admin, self.client)
-            #response = self.client.get('/pdf/pdftest1/')
-            response = self.client.get('/selectpdf/?page=AsciiDots?page=')
-            assert response.mimetype == "application/pdf"
-            pdf = response.data
-            assert pdf.startswith(b'%PDF')
-            assert b'AsciiDots' in pdf
-        with self.app.test_request_context():
-            received = md2pdf_single_page('pdftest1', 'pdf_page.html')
-        assert received.mimetype == "application/pdf"
-        #assert 'Content-Disposition' not in response.headers
-        assert b'AsciiDots' in received.data
-        #assert b'CreationDate' in pdf
-        assert b'localhost' in received.data
-        #pdf = re.sub(rb'.*CreationDate.*\n?', b'', pdf, flags=re.MULTILINE)
-        received.data = re.sub(rb'localhost', b'127.0.0.1:5000', received.data, flags=re.MULTILINE)
-        received.data = re.sub(rb'.*CreationDate.*\n?', b'', received.data, flags=re.MULTILINE)
-        #assert b'CreationDate' not in pdf
-        #assert b'AsciiDots' in pdf
-        #f = open("output.pdf", "wb")
-        #f.write(pdf)
-        #f.close()
+            actual_response = self.client.post('/selectpdf/', data=dict(page=['PDFTest1', 'PDFTest2']), follow_redirects=True)
+        assert actual_response.mimetype == "application/pdf"
+        actual = actual_response.data
+        assert actual.startswith(b'%PDF')
+        assert b'PDFTest1' in actual
+        assert b'PDFTest2' in actual
+        assert b'CreationDate' in actual
+        assert b'localhost' in actual
+        actual = re.sub(rb'localhost', b'127.0.0.1:5000', actual, flags=re.MULTILINE)
+        actual = re.sub(rb'.*CreationDate.*\n?', b'', actual, flags=re.MULTILINE)
+        assert b'PDFTest1' in actual
+        assert b'PDFTest2' in actual
+        assert b'CreationDate' not in actual
+        assert b'localhost' not in actual
         f = open("multiple_page_test.pdf", "rb")
-        pdf = f.read()
+        expected = f.read()
         f.close()
-        self.assertEqual(hashlib.md5(pdf).hexdigest(), hashlib.md5(received.data).hexdigest())
+        self.assertEqual(hashlib.md5(expected).hexdigest(), hashlib.md5(actual).hexdigest())
 
 
 if __name__ == '__main__':

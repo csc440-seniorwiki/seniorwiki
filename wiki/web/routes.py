@@ -227,12 +227,6 @@ def full_wiki_pdf():
     return md2pdf_full_wiki('pdf_page.html')
 
 
-@bp.route('/single_page_test.pdf')
-@protect
-def pdf_single_file_test():
-    return send_file('C:\\Users\\Justin\\GitRepos\\seniorwiki\\content\\asciidots.pdf')
-
-
 """
     Error Handlers
     ~~~~~~~~~~~~~~
