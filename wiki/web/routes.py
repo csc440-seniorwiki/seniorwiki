@@ -36,6 +36,7 @@ from wiki.web.roles import edit_protected_permission
 from wiki.web.md2pdf import md2pdf_single_page
 from wiki.web.md2pdf import md2pdf_multiple_page
 from wiki.web.md2pdf import md2pdf_full_wiki
+from flask import send_file
 
 bp = Blueprint('wiki', __name__)
 
@@ -224,6 +225,12 @@ def multiple_page_pdf():
 @protect
 def full_wiki_pdf():
     return md2pdf_full_wiki('pdf_page.html')
+
+
+@bp.route('/single_page_test.pdf')
+@protect
+def pdf_single_file_test():
+    return send_file('C:\\Users\\Justin\\GitRepos\\seniorwiki\\content\\asciidots.pdf')
 
 
 """

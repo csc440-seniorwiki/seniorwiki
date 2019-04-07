@@ -33,12 +33,21 @@ class ConversionTests(unittest.TestCase):
     def test_single_page_pdf(self):
         with self.client:
             login_to_website(admin, self.client)
-            response = self.client.get('/pdf/pdftest1', follow_redirects=True)
-            print(response.data)
+            response = self.client.get('/pdf/pdftest1/')#, follow_redirects=True)
+            assert response.mimetype == "application/pdf"
             pdf = response.data
+            assert pdf.startswith(b'%PDF')
+            assert b'AsciiDots' in pdf
         with self.app.test_request_context():
             received = md2pdf_single_page('pdftest1', 'pdf_page.html')
-
+        assert received.mimetype == "application/pdf"
+        assert 'Content-Disposition' not in response.headers
+        assert b'AsciiDots' in received.data
+        assert b'CreationDate' in pdf
+        pdf = re.sub(rb'.*CreationDate.*\n?', b'', pdf, flags=re.MULTILINE)
+        received.data = re.sub(rb'.*CreationDate.*\n?', b'', received.data, flags=re.MULTILINE)
+        assert b'CreationDate' not in pdf
+        assert b'AsciiDots' in pdf
         self.assertEqual(hashlib.md5(pdf).hexdigest(), hashlib.md5(received.data).hexdigest())
 
 
