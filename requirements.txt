@@ -17,3 +17,4 @@ flask_wtf
 Flask-Bootstrap
 flask-principal
 py-bcrypt
+GitPython
