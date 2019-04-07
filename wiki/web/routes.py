@@ -74,6 +74,16 @@ def polls():
 @bp.route('/poll/<path:url>/', methods=['GET', 'POST'])
 @protect
 def poll(url):
+    #print("Poll url")
+    #print(url)
+    #if request.data:
+    #if request.args.get['options']:
+        #print("GOT data!")
+        #option = request.args.get['options']
+        #print(option)
+        # request.args.get("search")
+    #else:
+        #print("nope")
     poll = current_poll_manager.get_poll(url)
     print(poll.data)
     return render_template('poll.html', poll=poll)
@@ -100,7 +110,7 @@ def addpoll(url):
         print(options)
         print(votes)
         return redirect(url_for(
-            'wiki.poll', url=(form.referenceName.data)))
+            'wiki.poll', url=(form.referenceName.data)))##url=URLForm().clean_url(url)))
     print("Phase 4")
     return render_template('addpoll.html', form=form, page=page)
 
