@@ -17,9 +17,10 @@
 							<ul class="nav">
 								<li><a href="{{ url_for('wiki.home') }}">Home</a></li>
 								<li><a href="{{ url_for('wiki.index') }}">Index</a></li>
-                                <li><a href="{{ url_for('wiki.polls') }}">Polls</a></li>
 								<li><a href="{{ url_for('wiki.tags') }}">Tags</a></li>
 								<li><a href="{{ url_for('wiki.search') }}">Search</a></li>
+								<li><a href="{{ url_for('wiki.user_index') }}">Users</a></li>
+								<li><a href="{{ url_for('wiki.group_index') }}">Groups</a></li>
 								<li class="divider-vertical"></li>
 								<li><a href="{{ url_for('wiki.create') }}">New Page</a></li>
 								<li class="divider-vertical"></li>
@@ -29,7 +30,9 @@
 							<ul class="nav pull-right">
 								{% if current_user.is_anonymous %}
 									<li><a href="{{ url_for('wiki.user_login') }}">Login</a></li>
+									<li><a href="{{ url_for('wiki.user_register') }}">Register</a></li>
 								{% else %}
+									<li> {{ current_user.name }} </li>
 									<li><a href="{{ url_for('wiki.user_logout') }}">Logout</a></li>
 								{% endif %}
 							</ul>

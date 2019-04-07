@@ -1,0 +1,25 @@
+{% from "helpers.html" import input %}
+<!DOCTYPE html>
+<html>
+	<head>
+		<link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='pdf_bootstrap.css') }}">
+		<link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='responsive.css') }}">
+		<link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='pygments.css') }}">
+	</head>
+
+	<body>
+        {% for page in pages %}
+		<div class="container">
+					{% block header scoped %}
+						<div class="page-header">
+							<h1>{% block title scoped %}{{ page.title }}{% endblock title %}</h1>
+						</div>
+					{% endblock header %}
+					{% block content scoped %}
+                        {{ page }}
+					{% endblock content %}
+		</div>
+        <div style="page-break-after: always;"></div>
+        {% endfor %}
+	</body>
+</html>

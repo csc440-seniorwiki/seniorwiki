@@ -2,6 +2,9 @@
     Wiki core
     ~~~~~~~~~
 """
+import shutil
+
+from wiki import git_integration
 from collections import OrderedDict
 from io import open
 import os
@@ -10,6 +13,8 @@ import re
 from flask import abort
 from flask import url_for
 import markdown
+
+from git import Repo, Actor
 
 
 def clean_url(url):
@@ -184,16 +189,23 @@ class Page(object):
         processor = Processor(self.content)
         self._html, self.body, self._meta = processor.process()
 
-    def save(self, update=True):
+    def save(self, modification_message, user, update=True):
         folder = os.path.dirname(self.path)
         if not os.path.exists(folder):
             os.makedirs(folder)
+            repo = Repo.init(git_integration.get_repo_path(self.path))
+        else:
+            repo = Repo(git_integration.get_repo_path(self.path))
+            repo.git.add(update=True)
         with open(self.path, 'w', encoding='utf-8') as f:
             for key, value in list(self._meta.items()):
                 line = '%s: %s\n' % (key, value)
                 f.write(line)
             f.write('\n')
             f.write(self.body.replace('\r\n', '\n'))
+        repo.index.add([self.path.replace("/", "\\")])
+        author = Actor(user, user + "@Riki.com")
+        repo.index.commit(modification_message, author=author, committer=author);
         if update:
             self.load()
             self.render()
@@ -236,6 +248,17 @@ class Page(object):
     @tags.setter
     def tags(self, value):
         self['tags'] = value
+
+    @property
+    def protected(self):
+        try:
+            return self['protected']
+        except KeyError:
+            return ""
+
+    @protected.setter
+    def protected(self, value):
+        self['protected'] = value
 
 
 class Wiki(object):
@@ -288,12 +311,16 @@ class Wiki(object):
         if not os.path.exists(folder):
             os.makedirs(folder)
         os.rename(source, target)
+        repo = Repo(git_integration.get_repo_path(target))
+        repo.index.add([target.replace("/", "\\")])
+        Repo(git_integration.get_repo_path(target)).index.commit("Moved to " + newurl)
 
     def delete(self, url):
         path = self.path(url)
         if not self.exists(url):
             return False
         os.remove(path)
+        shutil.rmtree(git_integration.get_repo_path(path))
         return True
 
     def index(self):
