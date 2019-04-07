@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+
+{% block title -%}
+Add a Poll
+{%- endblock title %}
+
+{% block content %}
+<form method="post" class="form">
+    {{ input(form.referenceName, placeholder="Poll reference name", class="span7") }}
+    {{ input(form.title, placeholder="Title", class="span7") }}
+    {{ input(form.option1, placeholder="Option 1", class="span7", autocomplete="off") }}
+    {{ input(form.option2, placeholder="Option 2", class="span7", autocomplete="off") }}
+    {{ input(form.option3, placeholder="Option 3 (Optional)", class="span7", autocomplete="off") }}
+    {{ input(form.option4, placeholder="Option 4 (Optional)", class="span7", autocomplete="off") }}
+    <div class="form-actions">
+        <div class="pull-left">
+            <a class="btn" href="{{ url_for('wiki.display', url=page.url) }}">Cancel</a>
+            <button class="btn btn-success" type="submit">Submit</button>
+        </div>
+    </div>
+</form>
+{% endblock content %}
