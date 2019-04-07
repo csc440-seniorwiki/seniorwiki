@@ -29,7 +29,7 @@ class ConversionTests(unittest.TestCase):
     def test_single_page_pdf(self):
         with self.client:
             login_to_website(admin, self.client)
-            actual_response = self.client.get('/pdf/pdftest1/pdftest1/')
+            actual_response = self.client.get('/pdf/pdftest1/')
         assert actual_response.mimetype == "application/pdf"
         actual = actual_response.data
         assert actual.startswith(b'%PDF')
@@ -49,7 +49,7 @@ class ConversionTests(unittest.TestCase):
     def test_multiple_page_pdf(self):
         with self.client:
             login_to_website(admin, self.client)
-            actual_response = self.client.post('/selectpdf/', data=dict(page=['PDFTest1/PDFTest1', 'PDFTest2/PDFTest2']), follow_redirects=True)
+            actual_response = self.client.post('/selectpdf/', data=dict(page=['PDFTest1', 'PDFTest2']), follow_redirects=True)
         assert actual_response.mimetype == "application/pdf"
         actual = actual_response.data
         assert actual.startswith(b'%PDF')
