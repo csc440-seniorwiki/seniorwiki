@@ -59,7 +59,7 @@ bp = Blueprint('wiki', __name__)
 @bp.route('/')
 @protect
 def home():
-    page = current_wiki.get('home')
+    page = current_wiki.get('home/home')
     if page:
         return display('home/home')
     return render_template('home.html')
