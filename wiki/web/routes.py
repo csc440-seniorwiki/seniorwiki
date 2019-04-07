@@ -24,15 +24,26 @@ from wiki.web.forms import LoginForm
 from wiki.web.forms import SearchForm
 from wiki.web.forms import URLForm
 from wiki.web.forms import RegisterForm
+from wiki.web.forms import UserRoleForm
+from wiki.web.forms import GroupRoleForm
+from wiki.web.forms import CreateGroupForm
 from wiki.web import current_wiki
 from wiki.web import current_users
-from wiki.web import current_user_manager
+from wiki.web import current_group_manager
+from wiki.web import load_user
+from wiki.web import load_group
 from wiki.web.user import protect
 from wiki.web.roles import edit_permission
 from wiki.web.roles import delete_permission
 from wiki.web.roles import create_page_permission
 from wiki.web.roles import rename_page_permission
 from wiki.web.roles import edit_protected_permission
+from wiki.web.roles import delete_user_permission
+from wiki.web.roles import edit_user_permission
+from wiki.web.roles import edit_group_permission
+from wiki.web.roles import delete_group_permission
+from wiki.web.roles import create_group_permission
+from wiki.web.roles import wiki_roles
 
 from wiki import git_integration
 from git import Repo
@@ -190,7 +201,7 @@ def user_login():
 def user_register():
     form = RegisterForm()
     if form.validate_on_submit():
-        current_user_manager.add_user(form.name.data, form.password.data)
+        current_users.add_user(form.name.data, form.password.data)
         flash('Registration successful, please login.', 'success')
         return redirect(request.args.get("next") or url_for('wiki.user_login'))
     return render_template('register.html', form=form)
@@ -212,18 +223,72 @@ def user_logout():
 
 @bp.route('/user/')
 def user_index():
-    pass
+    users = current_users.index()
+    return render_template('userindex.html', users=users)
 
 
-@bp.route('/user/<int:user_id>/')
+@bp.route('/group/')
+def group_index():
+    groups = current_group_manager.index()
+    return render_template('groupindex.html', groups=groups)
+
+
+@bp.route('/user/<string:user_id>/', methods=['GET', 'POST'])
+@protect
+@edit_user_permission.require(http_exception=401)
 def user_admin(user_id):
-    pass
+    form = UserRoleForm()
+    form.roles.choices = wiki_roles
+    form.groups.choices = map(lambda x: tuple([x.get_id(), x.get_id()]), current_group_manager.get_groups())
+    if form.validate_on_submit():
+        user = load_user(user_id)
+        user.set('roles', form.roles.data)
+        user.set('groups', form.groups.data)
+        return redirect(request.args.get("next") or url_for('wiki.user_login'))
+    return render_template('useradmin.html', form=form, page={"url": user_id})
 
 
-@bp.route('/user/delete/<int:user_id>/')
+@bp.route('/user/delete/<string:user_id>/')
+@protect
+@delete_user_permission.require(http_exception=401)
 def user_delete(user_id):
-    pass
+    current_users.delete_user(user_id)
+    flash('User deleted.', 'success')
+    return redirect(request.args.get("next") or url_for('wiki.user_login'))
 
+
+@bp.route('/group/create/', methods=['GET', 'POST'])
+@create_group_permission.require(http_exception=401)
+def group_create():
+    form = CreateGroupForm()
+    form.roles.choices = wiki_roles
+    if form.validate_on_submit():
+        current_group_manager.add_group(form.name.data, form.roles.data)
+        flash('Group creation successful.', 'success')
+        return redirect(request.args.get("next") or url_for('wiki.index'))
+    return render_template('creategroup.html', form=form)
+
+
+@bp.route('/group/<string:group_id>/', methods=['GET', 'POST'])
+@protect
+@edit_group_permission.require(http_exception=401)
+def group_admin(group_id):
+    form = GroupRoleForm()
+    form.roles.choices = wiki_roles
+    if form.validate_on_submit():
+        group = load_group(group_id)
+        group.set('roles', form.roles.data)
+        return redirect(request.args.get("next") or url_for('wiki.user_login'))
+    return render_template('groupadmin.html', form=form, group={"name": group_id})
+
+
+@bp.route('/group/delete/<string:group_id>/', methods=['GET', 'POST'])
+@protect
+@delete_group_permission.require(http_exception=401)
+def group_delete(group_id):
+    current_group_manager.delete_group(group_id)
+    flash('Group deleted.', 'success')
+    return redirect(request.args.get("next") or url_for('wiki.index'))
 
 """
     Error Handlers
