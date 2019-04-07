@@ -7,12 +7,15 @@ from wtforms import BooleanField
 from wtforms import StringField
 from wtforms import TextAreaField
 from wtforms import PasswordField
+from wtforms import SelectMultipleField
 from wtforms.validators import InputRequired
 from wtforms.validators import ValidationError
 
 from wiki.core import clean_url
 from wiki.web import current_wiki
 from wiki.web import current_users
+
+
 
 class URLForm(FlaskForm):
     url = StringField('', [InputRequired()])
@@ -24,6 +27,18 @@ class URLForm(FlaskForm):
     def clean_url(self, url):
         return clean_url(url)
 
+
+class PollForm(FlaskForm):
+    referenceName = StringField('', [InputRequired()])
+    title = StringField('', [InputRequired()])
+    option1 = StringField('', [InputRequired()])
+    option2 = StringField('', [InputRequired()])
+    option3 = StringField('')
+    option4 = StringField('')
+
+    def clean_url(self, url):
+        return clean_url(url)
+		
 
 class SearchForm(FlaskForm):
     term = StringField('', [InputRequired()])
@@ -37,6 +52,7 @@ class EditorForm(FlaskForm):
     title = StringField('', [InputRequired()])
     body = TextAreaField('', [InputRequired()])
     tags = StringField('')
+    modification = StringField('', [InputRequired()])
     protected = BooleanField(default=False)
 
 
@@ -65,3 +81,17 @@ class RegisterForm(FlaskForm):
         user = current_users.get_user(field.data)
         if user:
             raise ValidationError('This username already exists.')
+
+
+class UserRoleForm(FlaskForm):
+    roles = SelectMultipleField('roles')
+    groups = SelectMultipleField('groups')
+
+
+class GroupRoleForm(FlaskForm):
+    roles = SelectMultipleField('roles')
+
+
+class CreateGroupForm(FlaskForm):
+    name = StringField('', [InputRequired()])
+    roles = SelectMultipleField('roles')

@@ -1,6 +1,5 @@
 title: Main
-tags: interesting
+tags: 
 protected: True
 
-World
-[[hello|abc]] [[world|world]]
+Home page h
