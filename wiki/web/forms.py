@@ -28,6 +28,18 @@ class URLForm(FlaskForm):
         return clean_url(url)
 
 
+class PollForm(Form):
+    referenceName = TextField('', [InputRequired()])
+    title = TextField('', [InputRequired()])
+    option1 = TextField('', [InputRequired()])
+    option2 = TextField('', [InputRequired()])
+    option3 = TextField('')
+    option4 = TextField('')
+
+    def clean_url(self, url):
+        return clean_url(url)
+		
+
 class SearchForm(FlaskForm):
     term = StringField('', [InputRequired()])
     ignore_case = BooleanField(

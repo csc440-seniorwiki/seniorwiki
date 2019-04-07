@@ -9,6 +9,7 @@ from werkzeug.local import LocalProxy
 from flask_principal import Principal
 from wiki.core import Wiki
 from wiki.web.user import UserManager
+from wiki.web.poll import PollManager
 from wiki.web.group import GroupManager
 from flask_principal import identity_loaded, RoleNeed, UserNeed
 
@@ -48,6 +49,11 @@ def get_group_manager():
 
 current_group_manager = LocalProxy(get_group_manager)
 
+def get_poll_manager():
+    return PollManager(current_app.config['USER_DIR'])
+
+
+current_poll_manager = LocalProxy(get_poll_manager)
 
 def create_app(directory):
     app = Flask(__name__)

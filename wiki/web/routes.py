@@ -46,6 +46,9 @@ from wiki.web.roles import delete_group_permission
 from wiki.web.roles import create_group_permission
 from wiki.web.roles import wiki_roles
 
+from wiki.web.poll import PollManager
+from wiki.web import current_poll_manager
+
 from wiki import git_integration
 from git import Repo
 from wiki.web.md2pdf import md2pdf_single_page
@@ -106,6 +109,48 @@ def create():
             'wiki.edit', url=form.clean_url(form.url.data + '/' + form.url.data)))
     return render_template('create.html', form=form)
 
+	
+@bp.route('/polls/')
+@protect
+def polls():
+    pollData = current_poll_manager.read()
+    polls = pollData.items()
+    return render_template('polls.html', polls=polls)
+
+
+@bp.route('/poll/<path:url>/', methods=['GET', 'POST'])
+@protect
+def poll(url):
+    poll = current_poll_manager.get_poll(url)
+    print(poll.data)
+    return render_template('poll.html', poll=poll)
+
+
+@bp.route('/addpoll/<path:url>', methods=['GET', 'POST'])
+@protect
+def addpoll(url):
+    page = current_wiki.get(url)
+    form = PollForm()
+    if form.is_submitted():
+        options = [form.option1.data, form.option2.data]
+        votes = [0, 0]
+        if(form.option3.data):
+            options.append(form.option3.data)
+            votes.append(0)
+        if (form.option4.data):
+            options.append(form.option4.data)
+            votes.append(0)
+        print("Path: ")
+        print(current_app.config['USER_DIR'])
+        newPoll = current_poll_manager.add_poll(form.referenceName.data, form.title.data, options, votes)
+        newPoll.save()
+        print(options)
+        print(votes)
+        return redirect(url_for(
+            'wiki.poll', url=(form.referenceName.data)))
+    print("Phase 4")
+    return render_template('addpoll.html', form=form, page=page)
+	
 
 @bp.route('/edit/<path:url>/', methods=['GET', 'POST'])
 @protect
