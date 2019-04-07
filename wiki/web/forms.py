@@ -2,11 +2,12 @@
     Forms
     ~~~~~
 """
-from flask_wtf import Form
+from flask_wtf import FlaskForm
 from wtforms import BooleanField
-from wtforms import TextField
+from wtforms import StringField
 from wtforms import TextAreaField
 from wtforms import PasswordField
+from wtforms import SelectMultipleField
 from wtforms.validators import InputRequired
 from wtforms.validators import ValidationError
 
@@ -15,8 +16,9 @@ from wiki.web import current_wiki
 from wiki.web import current_users
 
 
-class URLForm(Form):
-    url = TextField('', [InputRequired()])
+
+class URLForm(FlaskForm):
+    url = StringField('', [InputRequired()])
 
     def validate_url(form, field):
         if current_wiki.exists(field.data):
@@ -25,37 +27,25 @@ class URLForm(Form):
     def clean_url(self, url):
         return clean_url(url)
 
-class PollForm(Form):
-    referenceName = TextField('', [InputRequired()])
-    title = TextField('', [InputRequired()])
-    option1 = TextField('', [InputRequired()])
-    option2 = TextField('', [InputRequired()])
-    option3 = TextField('')
-    option4 = TextField('')
 
-    def clean_url(self, url):
-        return clean_url(url)
-
-
-#class PollVoteForm(Form):
-    #RadioField('Label', choices=[('value','description'),('value_two','whatever')])
-
-class SearchForm(Form):
-    term = TextField('', [InputRequired()])
+class SearchForm(FlaskForm):
+    term = StringField('', [InputRequired()])
     ignore_case = BooleanField(
         description='Ignore Case',
         # FIXME: default is not correctly populated
         default=True)
 
 
-class EditorForm(Form):
-    title = TextField('', [InputRequired()])
+class EditorForm(FlaskForm):
+    title = StringField('', [InputRequired()])
     body = TextAreaField('', [InputRequired()])
-    tags = TextField('')
+    tags = StringField('')
+    modification = StringField('', [InputRequired()])
+    protected = BooleanField(default=False)
 
 
-class LoginForm(Form):
-    name = TextField('', [InputRequired()])
+class LoginForm(FlaskForm):
+    name = StringField('', [InputRequired()])
     password = PasswordField('', [InputRequired()])
 
     def validate_name(form, field):
@@ -69,3 +59,27 @@ class LoginForm(Form):
             return
         if not user.check_password(field.data):
             raise ValidationError('Username and password do not match.')
+
+
+class RegisterForm(FlaskForm):
+    name = StringField('', [InputRequired()])
+    password = PasswordField('', [InputRequired()])
+
+    def validate_name(form, field):
+        user = current_users.get_user(field.data)
+        if user:
+            raise ValidationError('This username already exists.')
+
+
+class UserRoleForm(FlaskForm):
+    roles = SelectMultipleField('roles')
+    groups = SelectMultipleField('groups')
+
+
+class GroupRoleForm(FlaskForm):
+    roles = SelectMultipleField('roles')
+
+
+class CreateGroupForm(FlaskForm):
+    name = StringField('', [InputRequired()])
+    roles = SelectMultipleField('roles')
