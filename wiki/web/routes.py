@@ -33,12 +33,6 @@ from wiki.web import current_users
 from wiki.web import current_group_manager
 from wiki.web import load_user
 from wiki.web import load_group
-from wiki.web.forms import PollForm
-from wiki.web import current_wiki
-from wiki.web import current_users
-from flask import current_app
-from wiki.web import current_poll_manager
-from wiki.web.poll import PollManager, PollBasic
 from wiki.web.user import protect
 from wiki.web.roles import edit_permission
 from wiki.web.roles import delete_permission
@@ -113,57 +107,6 @@ def create():
     return render_template('create.html', form=form)
 
 
-@bp.route('/polls/')
-@protect
-def polls():
-    pollData = current_poll_manager.read()
-    polls = pollData.items()
-    return render_template('polls.html', polls=polls)
-
-
-@bp.route('/poll/<path:url>/', methods=['GET', 'POST'])
-@protect
-def poll(url):
-    #print("Poll url")
-    #print(url)
-    #if request.data:
-    #if request.args.get['options']:
-        #print("GOT data!")
-        #option = request.args.get['options']
-        #print(option)
-        # request.args.get("search")
-    #else:
-        #print("nope")
-    poll = current_poll_manager.get_poll(url)
-    print(poll.data)
-    return render_template('poll.html', poll=poll)
-
-
-@bp.route('/addpoll/<path:url>', methods=['GET', 'POST'])
-@protect
-def addpoll(url):
-    page = current_wiki.get(url)
-    form = PollForm()
-    if form.is_submitted():
-        options = [form.option1.data, form.option2.data]
-        votes = [0, 0]
-        if(form.option3.data):
-            options.append(form.option3.data)
-            votes.append(0)
-        if (form.option4.data):
-            options.append(form.option4.data)
-            votes.append(0)
-        print("Path: ")
-        print(current_app.config['USER_DIR'])
-        newPoll = current_poll_manager.add_poll(form.referenceName.data, form.title.data, options, votes)
-        newPoll.save()
-        print(options)
-        print(votes)
-        return redirect(url_for(
-            'wiki.poll', url=(form.referenceName.data)))##url=URLForm().clean_url(url)))
-    print("Phase 4")
-    return render_template('addpoll.html', form=form, page=page)
-
 @bp.route('/edit/<path:url>/', methods=['GET', 'POST'])
 @protect
 @edit_permission.require(http_exception=401)
@@ -217,17 +160,6 @@ def get_image(filename):
 def images():
     image_list = os.listdir(os.path.join(os.path.dirname(os.path.abspath(__file__)), 'pic/'))
     return render_template("images.html", image_list=image_list)
-    page = current_wiki.get(url)
-    form = EditorForm(obj=page)
-
-    if form.validate_on_submit():
-        if not page:
-            page = current_wiki.get_bare(url)
-        form.populate_obj(page)
-        page.save()
-        flash('"%s" was saved.' % page.title, 'success')
-        return redirect(url_for('wiki.display', url=url))
-    return render_template('editor.html', form=form, page=page)
 
 
 @bp.route('/preview/', methods=['POST'])
