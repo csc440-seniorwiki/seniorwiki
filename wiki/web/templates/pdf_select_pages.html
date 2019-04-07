@@ -1,0 +1,37 @@
+{% extends "base.html" %}
+
+{% block title %}Page Index{% endblock title %}
+
+{% block content %}
+{% if data %}
+<p>
+{% for thing in data %}
+{{ thing }}
+{% endfor %}
+</p>
+{% endif %}
+{% if pages %}
+    <form method="POST">
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Title</th>
+                    <th>URL</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for page in pages %}
+                    <tr>
+                        <td><input type="checkbox" name="page" value="{{page.url}}"></td>
+                        <td><a href="{{ url_for('wiki.display', url=page.url) }}">{{ page.title }}</a></td>
+                        <td><a href="{{ url_for('wiki.display', url=page.url) }}">{{ page.url }}</a></td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        <input type="submit">
+    </form>
+{% else %}
+	<p>There are no pages yet.</p>
+{% endif %}
+{% endblock content %}

@@ -48,6 +48,10 @@ from wiki.web.roles import wiki_roles
 
 from wiki import git_integration
 from git import Repo
+from wiki.web.md2pdf import md2pdf_single_page
+from wiki.web.md2pdf import md2pdf_multiple_page
+from wiki.web.md2pdf import md2pdf_full_wiki
+from flask import send_file
 
 bp = Blueprint('wiki', __name__)
 
@@ -320,6 +324,23 @@ def group_delete(group_id):
     current_group_manager.delete_group(group_id)
     flash('Group deleted.', 'success')
     return redirect(request.args.get("next") or url_for('wiki.index'))
+@bp.route('/pdf/<path:url>/')
+@protect
+def single_page_pdf(url):
+    return md2pdf_single_page(url, 'pdf_page.html')
+
+
+@bp.route('/selectpdf/', methods=['GET', 'POST'])
+@protect
+def multiple_page_pdf():
+    return md2pdf_multiple_page('pdf_page.html', 'pdf_select_pages.html')
+
+
+@bp.route('/fullpdf/')
+@protect
+def full_wiki_pdf():
+    return md2pdf_full_wiki('pdf_page.html')
+
 
 """
     Error Handlers
