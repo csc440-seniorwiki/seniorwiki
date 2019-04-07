@@ -45,7 +45,7 @@ bp = Blueprint('wiki', __name__)
 def home():
     page = current_wiki.get('home')
     if page:
-        return display('home')
+        return display('home/home')
     return render_template('home.html')
 
 
@@ -101,7 +101,7 @@ def edit(url):
             if not page:
                 page = current_wiki.get_bare(url)
             form.populate_obj(page)
-            page.save(modification_message=str(form.modification.data))
+            page.save(modification_message=str(form.modification.data), user=current_user.name);
             flash('"%s" was saved.' % page.title, 'success')
             return redirect(url_for('wiki.display', url=url))
         return render_template('editor.html', form=form, page=page, can_edit_protected_permission=can_edit)

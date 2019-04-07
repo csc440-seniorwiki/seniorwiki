@@ -2,6 +2,8 @@
     Wiki core
     ~~~~~~~~~
 """
+import shutil
+
 from wiki import git_integration
 from collections import OrderedDict
 from io import open
@@ -12,7 +14,7 @@ from flask import abort
 from flask import url_for
 import markdown
 
-from git import Repo
+from git import Repo, Actor
 
 
 def clean_url(url):
@@ -187,9 +189,8 @@ class Page(object):
         processor = Processor(self.content)
         self._html, self.body, self._meta = processor.process()
 
-    def save(self, modification_message, update=True):
+    def save(self, modification_message, user, update=True):
         folder = os.path.dirname(self.path)
-        repo = ""
         if not os.path.exists(folder):
             os.makedirs(folder)
             repo = Repo.init(git_integration.get_repo_path(self.path))
@@ -203,7 +204,8 @@ class Page(object):
             f.write('\n')
             f.write(self.body.replace('\r\n', '\n'))
         repo.index.add([self.path.replace("/", "\\")])
-        repo.index.commit(modification_message)
+        author = Actor(user, user + "@Riki.com")
+        repo.index.commit(modification_message, author=author, committer=author);
         if update:
             self.load()
             self.render()
@@ -318,6 +320,7 @@ class Wiki(object):
         if not self.exists(url):
             return False
         os.remove(path)
+        shutil.rmtree(git_integration.get_repo_path(path))
         return True
 
     def index(self):

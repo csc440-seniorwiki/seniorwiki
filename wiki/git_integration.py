@@ -1,6 +1,3 @@
-from git import Repo
-
-
 def get_repo_path(path):
     path = path.replace('\\\\', '/').replace('\\', '/')
     url_array = path.split("/")
@@ -13,17 +10,15 @@ def get_repo_path(path):
 
 
 def get_difference_in_file(repo):
-    test = repo.index
     difference = []
     for commit in repo.iter_commits():
         difference = difference + [commit.summary + " made by " + commit.author.name + " on "
-                      + commit.authored_datetime.strftime('%d, %b  %Y')]
+                                   + commit.authored_datetime.strftime('%d, %b  %Y')]
     return difference
 
 
 def revert(repo, position):
     x = 0
-    new_head = None
     for commit in repo.iter_commits():
         if int(position) > x:
             repo.git.revert(commit, no_edit=True)
