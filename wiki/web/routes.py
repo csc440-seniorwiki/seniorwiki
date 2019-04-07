@@ -2,7 +2,8 @@
     Routes
     ~~~~~~
 """
-from flask import Blueprint
+import os
+from flask import Blueprint, send_from_directory
 from flask import flash
 from flask import redirect
 from flask import render_template
@@ -125,6 +126,36 @@ def edit(url):
         if edit_protected_permission.can():
             return load_page(wiki_page, True)
         return load_page(wiki_page, False)
+
+
+@bp.route('/uploader/')
+@protect
+def uploader():
+    return render_template('upload.html')
+
+
+@bp.route('/upload/', methods=['POST'])
+@protect
+def upload():
+    full_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'pic/')
+
+    for file in request.files.getlist("file"):
+        file_name = file.filename
+        destination = "\\".join([full_path, file_name])
+        file.save(destination)
+
+    return redirect(url_for('wiki.images'))
+
+
+@bp.route('/uploader/<filename>')
+def get_image(filename):
+    return send_from_directory("pic", filename)
+
+
+@bp.route('/images')
+def images():
+    image_list = os.listdir(os.path.join(os.path.dirname(os.path.abspath(__file__)), 'pic/'))
+    return render_template("images.html", image_list=image_list)
 
 
 @bp.route('/preview/', methods=['POST'])
