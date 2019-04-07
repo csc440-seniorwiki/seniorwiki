@@ -28,13 +28,13 @@ class URLForm(FlaskForm):
         return clean_url(url)
 
 
-class PollForm(Form):
-    referenceName = TextField('', [InputRequired()])
-    title = TextField('', [InputRequired()])
-    option1 = TextField('', [InputRequired()])
-    option2 = TextField('', [InputRequired()])
-    option3 = TextField('')
-    option4 = TextField('')
+class PollForm(FlaskForm):
+    referenceName = StringField('', [InputRequired()])
+    title = StringField('', [InputRequired()])
+    option1 = StringField('', [InputRequired()])
+    option2 = StringField('', [InputRequired()])
+    option3 = StringField('')
+    option4 = StringField('')
 
     def clean_url(self, url):
         return clean_url(url)

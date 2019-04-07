@@ -55,6 +55,7 @@ from wiki.web.md2pdf import md2pdf_single_page
 from wiki.web.md2pdf import md2pdf_multiple_page
 from wiki.web.md2pdf import md2pdf_full_wiki
 from flask import send_file
+from wiki.web.forms import PollForm
 
 bp = Blueprint('wiki', __name__)
 
@@ -109,7 +110,7 @@ def create():
             'wiki.edit', url=form.clean_url(form.url.data + '/' + form.url.data)))
     return render_template('create.html', form=form)
 
-	
+
 @bp.route('/polls/')
 @protect
 def polls():
@@ -134,7 +135,7 @@ def addpoll(url):
     if form.is_submitted():
         options = [form.option1.data, form.option2.data]
         votes = [0, 0]
-        if(form.option3.data):
+        if (form.option3.data):
             options.append(form.option3.data)
             votes.append(0)
         if (form.option4.data):
@@ -150,7 +151,7 @@ def addpoll(url):
             'wiki.poll', url=(form.referenceName.data)))
     print("Phase 4")
     return render_template('addpoll.html', form=form, page=page)
-	
+
 
 @bp.route('/edit/<path:url>/', methods=['GET', 'POST'])
 @protect
@@ -369,6 +370,8 @@ def group_delete(group_id):
     current_group_manager.delete_group(group_id)
     flash('Group deleted.', 'success')
     return redirect(request.args.get("next") or url_for('wiki.index'))
+
+
 @bp.route('/pdf/<path:url>/')
 @protect
 def single_page_pdf(url):
