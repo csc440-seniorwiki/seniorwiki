@@ -117,13 +117,8 @@ def addpoll(url):
 @bp.route('/edit/<path:url>/', methods=['GET', 'POST'])
 @protect
 def edit(url):
-    if url.find("&poll="):
-        pollText = "{" + url[url.find("?poll=")+1:] + "}"
-        url = url[0:url.find("?poll=")]
     page = current_wiki.get(url)
     form = EditorForm(obj=page)
-    if pollText:
-        form.body.data = form.body.data + "\n" + pollText
 
     if form.validate_on_submit():
         if not page:
