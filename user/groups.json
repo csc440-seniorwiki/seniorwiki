@@ -1,0 +1,16 @@
+{
+  "administrators": {
+    "roles": [
+      "wiki_edit",
+      "wiki_delete",
+      "wiki_rename_page",
+      "wiki_create_page",
+      "wiki_edit_protected",
+      "wiki_delete_user",
+      "wiki_edit_user",
+      "wiki_edit_group",
+      "wiki_delete_group",
+      "wiki_create_group"
+    ]
+  }
+}

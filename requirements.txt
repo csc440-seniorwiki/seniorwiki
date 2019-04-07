@@ -16,3 +16,7 @@ flask_login
 flask_wtf
 Flask-Bootstrap
 flask-principal
+weasyprint
+flask-weasyprint
+py-bcrypt
+GitPython

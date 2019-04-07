@@ -15,13 +15,16 @@ Wiki Editor
 			{{ form.hidden_tag() }}
 			{{ input(form.title, placeholder="Title", class="span7", autocomplete="off") }}
 			{{ input(form.body, placeholder="Markdown", class="span7", rows="20") }}
-			{{ input(form.tags, placeholder="Tags (comma separated)", class="span7", autocomplete="off") }}
+            {{ input(form.tags, placeholder="Tags (comma separated)", class="span7", autocomplete="off") }}
+            {{ input(form.modification, placeholder="Modification notes", class="span7", autocomplet="off") }}
             {% if can_edit_protected_permission %}
                 {{ input(form.protected, placeholder=False, class="span7", autocomplete="off") }}
             {% endif %}
 			<div class="form-actions">
         <div class="pull-left">
           <a class="btn" href="#preview" id="previewbtn">Preview</a>
+            <a class="btn" href="{{ url_for('wiki.uploader') }}">Upload</a>
+            <a class="btn" href="{{ url_for('wiki.images') }}">Images</a>
         </div>
 				<div class="pull-right">
           <a class="btn" href="{{ url_for('wiki.display', url=page.url) }}">Cancel</a>

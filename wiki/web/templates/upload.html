@@ -1,0 +1,12 @@
+{% extends "base.html" %}
+{% block title -%}
+	Upload
+{% endblock title %}
+
+{% block content %}
+    <p>Upload a file</p>
+<form id="upload-form" action="{{ url_for('wiki.upload') }}" method="post" enctype="multipart/form-data">
+    <input type="file" name="file" accept="image/*" multiple>
+    <input type="submit" value="Upload">
+</form>
+{% endblock %}
