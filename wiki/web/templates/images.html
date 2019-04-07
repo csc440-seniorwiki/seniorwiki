@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+{% block title -%}
+	Images
+{% endblock title %}
+
+{% block content %}
+    	<table class="table">
+		<thead>
+			<tr>
+				<th>Image</th>
+				<th>File Name</th>
+			</tr>
+		</thead>
+		<tbody>
+			{% for image in image_list %}
+				<tr>
+					<td><img src="{{ url_for('wiki.get_image', filename=image) }}"></td>
+					<td>{{ url_for('wiki.get_image', filename=image) }}</td>
+				</tr>
+			{% endfor %}
+		</tbody>
+	</table>
+{% endblock %}
