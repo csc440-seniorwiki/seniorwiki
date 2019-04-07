@@ -1,0 +1,46 @@
+import unittest
+import os
+import re
+import hashlib
+from weasyprint import HTML
+from pathlib import Path
+from wiki.web import create_app
+from wiki.web.md2pdf import md2pdf_single_page
+from wiki.web.md2pdf import md2pdf_multiple_page
+from wiki.web.md2pdf import md2pdf_full_wiki
+
+
+admin = {'username': 'admin', 'password': "password"}
+
+
+def login_to_website(user, client):
+    rv = client.get('/user/login/')
+    m = re.search(b'<input id="csrf_token" name="csrf_token" type="hidden" value="(.*)">', rv.data)
+    return client.post('/user/login/', data=dict(
+        name=user['username'],
+        password=user['password'],
+        csrf_token=m.group(1).decode("utf-8")
+    ), follow_redirects=True)
+
+
+class ConversionTests(unittest.TestCase):
+
+    def setUp(self):
+        app = create_app(Path(os.getcwd()).parent.parent)
+        self.app = app
+        self.client = app.test_client()
+
+    def test_single_page_pdf(self):
+        with self.client:
+            login_to_website(admin, self.client)
+            response = self.client.get('/pdf/pdftest1', follow_redirects=True)
+            print(response.data)
+            pdf = response.data
+        with self.app.test_request_context():
+            received = md2pdf_single_page('pdftest1', 'pdf_page.html')
+
+        self.assertEqual(hashlib.md5(pdf).hexdigest(), hashlib.md5(received.data).hexdigest())
+
+
+if __name__ == '__main__':
+    unittest.main()
