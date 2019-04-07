@@ -34,6 +34,7 @@
   <li><a href="{{ url_for('wiki.edit', url=page.url) }}">Edit</a></li>
   <li><a href="{{ url_for('wiki.move', url=page.url) }}">Move</a></li>
   <li><a href="{{ url_for('wiki.display_history', url=page.url) }}"> History</a></li>
+  <li><a href="{{ url_for('wiki.addpoll', url=page.url) }}">Add a poll</a></li>
   <li><a href="#confirmDelete" data-toggle="modal" class="text-error">Delete</a></li>
 </ul>
 {% endblock sidebar %}
